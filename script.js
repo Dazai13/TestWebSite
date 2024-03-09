@@ -1,141 +1,87 @@
-/*Import Table*/
-var importedEntries = [];
-function checkDuplicateEntry(schetnomer, vaknazv, zarpl) {
-  for (var i = 0; i < importedEntries.length; i++) {
-    var entry = importedEntries[i];
-    if (entry.schetnomer === schetnomer && entry.vaknazv === vaknazv && entry.zarpl === zarpl) {
-      return true;
+// Получаем все слайды
+var slides = document.querySelectorAll('.carousel');
+// Текущий индекс слайда
+var currentSlideIndex = 0;
+
+// Функция для отображения текущего слайда
+function showSlide(index) {
+    // Проверяем, что индекс находится в допустимом диапазоне
+    if (index >= 0 && index < slides.length) {
+        // Скрываем все слайды
+        slides.forEach(function(slide) {
+            slide.style.display = 'none';
+        });
+        // Отображаем текущий слайд
+        slides[index].style.display = 'block';
     }
-  }
-  return false;
 }
-function importXml() {
-  var xmlFileInput = document.getElementById("xmlFileInput");
-  var files = xmlFileInput.files;
-  var tableBody = document.getElementById("data-table").getElementsByTagName("tbody")[0];
-  var rowCount = tableBody.getElementsByTagName("tr").length;
-  var selectElement = document.getElementById("selectOutput");
-  for (var i = 0; i < files.length; i++) {
-    var file = files[i];
-    var reader = new FileReader();
-    reader.onload = function (e) {
-      var xmlContent = e.target.result;
-      var decoder = new TextDecoder("windows-1251");
-      var xmlDecoded = decoder.decode(new Uint8Array(xmlContent));
-      var parser = new DOMParser();
-      var xmlDoc = parser.parseFromString(xmlDecoded, "text/xml");
-      var rows = xmlDoc.getElementsByTagName("ROW");
-      var uniqueValues = new Set();
-      for (var j = 0; j < rows.length; j++) {
-        var row = rows[j];
-        var schetnomer = getXmlValue(row, "SCHETNOMER") || "Unknown";
-        var schetdata = getXmlValue(row, "SCHETDATA");
-        var innkomban = getXmlValue(row, "INNKOMPAN");
-        var nazvkomban = getXmlValue(row, "NAZVKOMPAN");
-        var telef = getXmlValue(row, "TELEF");
-        var elpocht = getXmlValue(row, "ELPOCHTA") + getXmlValue(row, "ELPOCHTAKADROVIK") || "";
-        var vaknazv = getXmlValue(row, "VAKNAZV");
-        var oblast = getXmlValue(row, "ADRESSORABOTI-OBLAST");
-        var sourceFile = file.name;
-        var duplicateEntry = checkDuplicateEntry(schetnomer, vaknazv, elpocht);
-        var isDuplicateRow = false;
 
-        // Поиск совпадающей строки по `innkomban` и `nazvkomban`
-        var existingRow;
-        for (var k = 0; k < rowCount; k++) {
-          existingRow = tableBody.getElementsByTagName("tr")[k];
-          var infoCell = existingRow.cells[1];
-          var existingInnkomban = existingRow.cells[1].textContent.split("\n")[0].trim();
-          var existingNazvkomban = existingRow.cells[1].textContent.split("\n")[1].trim();
-          if (existingInnkomban === innkomban && existingNazvkomban === nazvkomban) {
-            isDuplicateRow = true;
-            break;
-          }
-        }
+// Функция для создания кнопок страниц
+function createPageButtons() {
+    var pageNumberContainer = document.querySelector('.page-numbers');
+    pageNumberContainer.innerHTML = ''; // Очищаем содержимое контейнера кнопок
+    for (var i = 0; i < slides.length; i++) {
+        var button = document.createElement('button');
+        button.classList.add('page-button');
+        button.textContent = i + 1;
+        button.addEventListener('click', function() {
+            var pageIndex = parseInt(this.textContent) - 1;
+            showSlide(pageIndex);
+        });
+        pageNumberContainer.appendChild(button);
+    }
+}
 
-        if (!duplicateEntry && !isDuplicateRow && schetnomer && schetdata && elpocht) {
-          // Создание новой строки, если не найдена совпадающая строка
-          if (!isDuplicateRow) {
-            var newRow = createTableRow(rowCount + 1, innkomban, nazvkomban, telef, elpocht, schetnomer, schetdata, vaknazv, sourceFile);
-            tableBody.appendChild(newRow);
-            importedEntries.push({ schetnomer: schetnomer, vaknazv: vaknazv, elpocht: elpocht });
-            rowCount++;
-          }
-          
-          // Обновление значений предыдущей строки в случае совпадения `innkomban` и `nazvkomban`
-          else {
-            var prevCalculationCell = existingRow.cells[3];
-            var prevActiveVacanciesCell = existingRow.cells[4];
-            var prevSourceCell = existingRow.cells[6];
-            prevCalculationCell.textContent += "\n" + schetnomer + " / " + schetdata;
-            prevActiveVacanciesCell.textContent += "\n" + vaknazv;
-            prevSourceCell.textContent += "\n" + sourceFile;
-          }
-          uniqueValues.add(oblast);
-        }
+// Создаем кнопки страниц
+createPageButtons();
+
+// Функция для перехода к предыдущему слайду
+function goToPrevSlide() {
+    currentSlideIndex--;
+    if (currentSlideIndex < 0) {
+        currentSlideIndex = slides.length - 1;
+    }
+    showSlide(currentSlideIndex);
+}
+
+// Функция для перехода к следующему слайду
+function goToNextSlide() {
+    currentSlideIndex++;
+    if (currentSlideIndex >= slides.length) {
+        currentSlideIndex = 0;
+    }
+    showSlide(currentSlideIndex);
+}
+
+// Функция для разделения таблицы на слайды
+function splitTableIntoSlides() {
+  var tableRows = document.querySelectorAll('#data-table tbody tr');
+  var slideHeight = 700;
+  var currentSlide = null;
+  var currentSlideHeight = 0;
+  
+  // Перебираем все строки таблицы
+  tableRows.forEach(function(row) {
+      // Если текущая строка не помещается в текущий слайд, создаем новый слайд
+      if (!currentSlide || currentSlideHeight + row.clientHeight > slideHeight) {
+          // Создаем новый слайд
+          currentSlide = document.createElement('div');
+          currentSlide.classList.add('carousel');
+          currentSlideHeight = 0;
+          // Вставляем новый слайд после последнего слайда
+          document.querySelector('.slider').appendChild(currentSlide);
       }
-      selectElement.innerHTML = "";
-      uniqueValues.forEach(function (value) {
-        var option = document.createElement("option");
-        option.value = value;
-        option.textContent = value;
-        selectElement.appendChild(option);
-
-      });
-    };
-    reader.readAsArrayBuffer(file);
-  }
+      
+      // Перемещаем строку в текущий слайд
+      currentSlide.appendChild(row);
+      currentSlideHeight += row.clientHeight;
+  });
+  
+  // Переинициализируем переменные слайдера
+  slides = document.querySelectorAll('.carousel');
+  currentSlideIndex = 0;
+  createPageButtons(); // Создаем кнопки страниц для новых слайдов
 }
 
-
-
-function createTableRow(index, innkomban, nazvkomban, telef, elpocht, schetnomer, schetdata, vaknazv, sourceFile) {
-  var newRow = document.createElement("tr");
-  var listNumberCell = document.createElement("td");
-  listNumberCell.textContent = index;
-  newRow.appendChild(listNumberCell);
-  var infoCell = document.createElement("td");
-  infoCell.textContent = innkomban + "\n" + nazvkomban + "\n" + telef + "\n" + elpocht;
-  newRow.appendChild(infoCell);
-  var emptyCell1 = document.createElement("td");
-  newRow.appendChild(emptyCell1);
-  var calculationCell = document.createElement("td");
-  calculationCell.textContent = schetnomer + " / " + schetdata;
-  newRow.appendChild(calculationCell);
-  var activeVacanciesCell = document.createElement("td");
-
-  activeVacanciesCell.textContent = vaknazv;
-  newRow.appendChild(activeVacanciesCell);
-  var emptyCell2 = document.createElement("td");
-  newRow.appendChild(emptyCell2);
-  var sourceCell = document.createElement("td");
-  sourceCell.textContent = sourceFile;
-  newRow.appendChild(sourceCell);
-  var emptyCell3 = document.createElement("td");
-  newRow.appendChild(emptyCell3);
-  return newRow;
-}
-function getXmlValue(row, tagName) {
-  var element = row.getElementsByTagName(tagName)[0];
-  return element ? element.textContent : "";
-}
-var xmlFileInput = document.getElementById("xmlFileInput");
-xmlFileInput.addEventListener("change", importXml);
-var input = document.getElementById("searchInput");
-input.addEventListener("input", handleSearch);
-document.getElementById("importXmlButton").addEventListener("click", importXml);
-var searchInput = document.getElementById("searchInput");
-document.addEventListener('DOMContentLoaded', function() {
-  var searchInput = document.getElementById("searchInput");
-  searchInput.addEventListener("input", handleSearch);
-});
-var links = document.querySelectorAll("#data-table tbody a");
-links.forEach(function(link) {
-  link.addEventListener("click", handleLinkClick);
-});
-/*------------------------------------------------------------*/
-/*Курсор на месте при перезагрузкке (Пункт 3)*/
-window.addEventListener('beforeunload', function(event) {
-  localStorage.setItem('cursorX', event.clientX);
-  localStorage.setItem('cursorY', event.clientY);
-});
+// Вызываем функцию разделения таблицы на слайды после загрузки страницы
+window.addEventListener('load', splitTableIntoSlides);

@@ -78,7 +78,7 @@
                                 </div>
                             </td>
                             <td>
-                                <button class="button add-button" onclick="showAddPopup()">+ ADD A NEW ONE</button>
+                                <button class="button add-button" onclick="addNewRow()">+ ADD A NEW ONE</button>
                             </td>
                             <td>
                                 <button class="button add-new-button" onclick="clearFields()"><img class = "deselct__img" src = "assets/img/Deselect.png"> DESELECT</button>
@@ -160,7 +160,7 @@
             <div class="page-numbers">
               <button class="prev-button"><<</button>
               <button class="page-button">first</button>
-              <button class="page-button active">1</button>
+              <button class="page-button">1</button>
               <button class="page-button">2</button>
               <button class="page-button">3</button>
               <button class="page-button">4</button>
@@ -194,7 +194,7 @@
                     <th><a class = "data-table__heaeder__title" href="#" onclick="handleSort(4)">Активные вакансии</a></th>
                     <th><a class = "data-table__heaeder__title" href="#" onclick="handleSort(5)">Отклики</a></th>
                     <th><a class = "data-table__heaeder__title" href="#" onclick="handleSort(6)">Источник объявления</a></th>
-                    <th><a class = "data-table__heaeder__title" href="#" onclick="handleSort(7)">Завершенные</a></th>
+                    <th><a class = "data-table__heaeder__title" href="#" onclick="handleSort(7)">Заве-ршен-ные</a></th>
                   </tr>
                   <tr class = "search">
                     <td>
@@ -289,11 +289,11 @@
           </div>
         </div>
         <div class="import__footer">
-          <button class="import__button" onclick="importXml()">Загрузить</button>
+          <button class="import__button" id = "importXmlButton" onclick="importXml()">Загрузить</button>
           <button class="cancel__button" onclick="cancelImport()">ОТМЕНИТЬ</button>
         </div>
         <span class="close-icon" onclick="cancelImport()"><img src="assets/img/Component 4.png" alt=""></span>
-      </div>
+    </div>
       
     <!--Export-->
 
@@ -310,7 +310,7 @@
         <div class="export__body">
           <div class="export__content">
             <div class="content__title">
-              Выберите путь для экспорта
+                Выберите путь к файлу
             </div>
             <div class="export__label">
               <input type="file" id="xmlFileOutput" class="file-output" multiple>
@@ -319,14 +319,86 @@
           </div>
         </div>
         <div class="export__footer">
-          <button class="export__button" onclick="exportXml()">Экспортировать</button>
+          <button class="export__button" onclick="exportToXML()">Экспортировать</button>
           <button class="cancel__button" onclick="cancelExport()">ОТМЕНИТЬ</button>
         </div>
         <span class="close-icon" onclick="cancelExport()"><img src="assets/img/Component 4.png" alt=""></span>
+    </div>
+
+    <div id="addPopup" class="popup">
+      <div class="addPopup__header">
+        <div class="addPopup__title">
+          <p class="addPopup__title__text">Добавить компанию</p>
+        </div>
+        <div class="addPopup__header__content">
+          <p class="addPopup__data">Дата <strong>12.11.2023</strong></p>
+          <p>ФИО оператора: <a class="addPopup__link" href="#">Александра Герасимчук</a></p>
+        </div>
       </div>
-      <div id="overlay" onclick="closePopup()"></div>
+      <div class="addPopup__body">
+        <span class="close-icon" onclick="cancelExport()"><img src="assets/img/Component 4.png" alt=""></span>
+        <div class="addPopup__popup-content">          
+          <div class = "addPopup__popup-content__input">
+              <label for="innkombanInput">ИНН</label>
+              <input class = "addPopup__input" type="text" id="innkombanInput">
+          </div>
+          <div class = "addPopup__popup-content__input">
+              <label for="">Юредическая форма</label>
+              <input class = "addPopup__input" type="text" id="">
+          </div>
+          <div class = "addPopup__popup-content__input">
+              <label for="nazvkombanInput">Полное название</label>
+              <input class = "addPopup__input" type="text" id="nazvkombanInput">
+          </div>
+          <div class = "addPopup__popup-content__input">
+              <label for="">Сокращеное название</label>
+              <input class = "addPopup__input" type="text" id="">
+          </div>
+          <div class = "addPopup__popup-content__input">
+              <label for="telefInput">Телефон</label>
+              <input class = "addPopup__input" type="text" id="telefInput">
+          </div>
+          <div class = "addPopup__popup-content__input">
+              <label for="emailInput">Email</label>
+              <input class = "addPopup__input" type="text" id="emailInput">
+          </div>
+          <div class = "addPopup__popup-content__input">
+              <label for="adressInput">Адрес</label>
+              <input class = "addPopup__input" type="text" id="adressInput">
+          </div>
+          <div class = "addPopup__popup-content__input">
+              <label for="sourceFileInput">ОКВЕД 1</label>
+              <input class = "addPopup__input" type="text" id="sourceFileInput">
+          </div>
+          <div class = "addPopup__popup-content__input">
+              <label for="schetdataInput">ОКВЕД 2</label>
+              <input class = "addPopup__input" type="text" id="schetdataInput">
+          </div>
+          <div class = "addPopup__popup-content__input">
+              <label for="vaknazvInput">ОКВЕД 3</label>
+              <input class = "addPopup__input" type="text" id="vaknazvInput">
+          </div>
+          <div class = "addPopup__popup-content__input">
+              <label for="sourceFileInput">Статус / Дата ликвидации</label>
+              <input class = "addPopup__input" type="text" id="sourceFileInput">
+          </div>
+          <div class = "addPopup__popup-content__input">
+            <label for="sourceFileInput">Логотип</label>
+            <input class = "addPopup__input" type="text" id="sourceFileInput">
+          </div>
+        </div>
+      </div> 
+      <div class="addPopup__footer">
+         <div>
+          <button class="export__button" id="saveNewButton" >Сохранить</button>
+          <button class="cancel__button" id="cancelAddButton" onclick="cancelAdd()">Отмена</button>
+        </div>         
+      </div>   
+    </div>
+
+    <script src = "assets/js/import.js"></script>
+    <script src = "add.js"></script>
     <script src = "close.js"></script>
     <script src = "script.js"></script>
-    <script src = "app.js"></script>
     </body>
 </html>
